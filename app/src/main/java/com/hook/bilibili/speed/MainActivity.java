@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,11 +21,16 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
         super.onCreate(savedInstanceState);
         // 获取SharedPreferences实例
-        prefs = this.getSharedPreferences("speed", MODE_PRIVATE);
+        try {
+            prefs = this.getSharedPreferences("speed", Context.MODE_WORLD_READABLE);
+        } catch (Exception e) {
+            Toast.makeText(this, "Exception: " + e, Toast.LENGTH_SHORT).show();
+        }
         if (prefs == null) {
-            Toast.makeText(this, "不支持XSharedPreferences", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "未激活模块或不支持XSharedPreferences", Toast.LENGTH_SHORT).show();
         } else {
             setContentView(R.layout.activity_main);
             // 初始化UI组件

@@ -18,7 +18,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
  */
 public class MainHook implements IXposedHookLoadPackage {
     // 共享偏好设置，用于存储和读取播放速度配置
-    private static final XSharedPreferences prefs = new XSharedPreferences("com.hook.bili.speed", "speed");
+    private static final XSharedPreferences prefs = new XSharedPreferences("com.hook.bilibili.speed", "speed");
     // 默认播放速度
     private static final float DEFAULT_SPEED = 1.0f;
 
@@ -61,7 +61,7 @@ public class MainHook implements IXposedHookLoadPackage {
      */
     private void hookBilibiliPlayer(XC_LoadPackage.LoadPackageParam lpparam) {
         if (hookNotifyOnInfo != null) return;
-        XposedBridge.log("XposedHook load package successfully: " + lpparam.packageName);
+//        XposedBridge.log("XposedHook load package successfully: " + lpparam.packageName);
 
         // Hook AbstractMediaPlayer的notifyOnInfo方法作为入口点
         hookNotifyOnInfo = XposedHelpers.findAndHookMethod(
@@ -78,7 +78,7 @@ public class MainHook implements IXposedHookLoadPackage {
                         hookOnPreparedListener(param, lpparam);
                     }
                 });
-        XposedBridge.log("Have hooked AbstractMediaPlayer -> notifyOnInfo");
+//        XposedBridge.log("Have hooked AbstractMediaPlayer -> notifyOnInfo");
     }
 
     /**
@@ -92,7 +92,7 @@ public class MainHook implements IXposedHookLoadPackage {
         // 获取mOnPreparedListener字段
         Field mOnPreparedListener = XposedHelpers.findField(param.thisObject.getClass(), "mOnPreparedListener");
         Class<?> listenerClass = mOnPreparedListener.get(param.thisObject).getClass();
-        XposedBridge.log("Find field mOnPreparedListener in AbstractMediaPlayer");
+//        XposedBridge.log("Find field mOnPreparedListener in AbstractMediaPlayer");
 
         // Hook OnPreparedListener的onPrepared方法
         hookOnPreparedListener_OnPrepared = XposedHelpers.findAndHookMethod(
@@ -106,7 +106,7 @@ public class MainHook implements IXposedHookLoadPackage {
                         hookPlayerInstance(param, lpparam);
                     }
                 });
-        XposedBridge.log("Have hooked mOnPreparedListener -> onPrepared");
+//        XposedBridge.log("Have hooked mOnPreparedListener -> onPrepared");
     }
 
     /**
@@ -119,7 +119,7 @@ public class MainHook implements IXposedHookLoadPackage {
             throws IllegalAccessException {
         // 获取播放器实例
         Field[] fields = param.thisObject.getClass().getDeclaredFields();
-        XposedBridge.log("Found fields count: " + fields.length);
+//        XposedBridge.log("Found fields count: " + fields.length);
 
         Field playerField = fields[0];
         if (playerField == null) {
@@ -130,7 +130,7 @@ public class MainHook implements IXposedHookLoadPackage {
         playerField.setAccessible(true);
         Object playerInstance = playerField.get(param.thisObject);
         Class<?> playerClass = playerInstance.getClass();
-        XposedBridge.log("Chosen field : " + playerClass);
+//        XposedBridge.log("Chosen field : " + playerClass);
 
         // 获取OnPreparedListener接口类
         Class<?> onPreparedListenerInterface = XposedHelpers.findClass(
@@ -144,7 +144,7 @@ public class MainHook implements IXposedHookLoadPackage {
                 if (field.getType() == onPreparedListenerInterface && !Modifier.isFinal(field.getModifiers())) {
                     field.setAccessible(true);
                     Class<?> preparedListenerClass = field.get(playerInstance).getClass();
-                    XposedBridge.log(" Found field OnPreparedListener: " + preparedListenerClass);
+//                    XposedBridge.log(" Found field OnPreparedListener: " + preparedListenerClass);
 
                     // Hook最终的OnPreparedListener
                     hookFinalOnPreparedListener(preparedListenerClass);
@@ -171,7 +171,7 @@ public class MainHook implements IXposedHookLoadPackage {
                         setupPlaybackSpeedControl(param);
                     }
                 });
-        XposedBridge.log("Hooked method onPrepared");
+//        XposedBridge.log("Hooked method onPrepared");
     }
 
     /**
@@ -182,15 +182,15 @@ public class MainHook implements IXposedHookLoadPackage {
     private void setupPlaybackSpeedControl(XC_MethodHook.MethodHookParam param) throws IllegalAccessException {
         // 获取播放器控制实例
         Field[] fields = param.thisObject.getClass().getDeclaredFields();
-        XposedBridge.log("Found fields count: " + fields.length);
+//        XposedBridge.log("Found fields count: " + fields.length);
         Field controlField = fields[0];
         controlField.setAccessible(true);
         Class<?> controlClass = controlField.get(param.thisObject).getClass();
-        XposedBridge.log("Chosen field: " + controlClass);
+//        XposedBridge.log("Chosen field: " + controlClass);
         // 查找设置播放速度的方法
         for (Method method : controlClass.getDeclaredMethods()) {
             if (isSetSpeedMethod(method)) {
-                XposedBridge.log( "Found method to setup the speed: " + method);
+//                XposedBridge.log( "Found method to setup the speed: " + method);
                 // 初始化速度配置
                 final float[] currentSpeed = {getSpeedConfig()};
                 // Hook设置速度方法
@@ -201,12 +201,7 @@ public class MainHook implements IXposedHookLoadPackage {
                 hookNotifyOnInfo.unhook();
                 hookOnPreparedListener_OnPrepared.unhook();
                 hookFinalOnPreparedListener_onPrepared.unhook();
-//                hookNotifyOnInfo = null;
-//                hookOnPreparedListener_OnPrepared = null;
-//                hookFinalOnPreparedListener_onPrepared = null;
                 break;
-            }else{
-                XposedBridge.log("Found method in controlClass: " + method);
             }
         }
         XposedBridge.log("Cannot find the method to setup the speed");
@@ -239,7 +234,7 @@ public class MainHook implements IXposedHookLoadPackage {
                     StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
                     for (int i = 4; i < stackTrace.length; i++) {
                         if (stackTrace[i].getClassName().equals("com.bilibili.player.tangram.basic.PlaySpeedManagerImpl")) {
-                            XposedBridge.log("User changed the speed manually: " + param.args[0]);
+//                            XposedBridge.log("User changed the speed manually: " + param.args[0]);
                             currentSpeed[0] = (float) param.args[0];
                             return;
                         }
@@ -247,7 +242,7 @@ public class MainHook implements IXposedHookLoadPackage {
                 }
             }
         });
-        XposedBridge.log("Have hooked method to setup the speed");
+//        XposedBridge.log("Have hooked method to setup the speed");
     }
 
     /**
@@ -263,7 +258,7 @@ public class MainHook implements IXposedHookLoadPackage {
             protected void afterHookedMethod(MethodHookParam param) {
                 // 检查配置是否变化
                 if (hasSpeedConfigChanged()) {
-                    XposedBridge.log("config changed: " + currentSpeed[0]);
+//                    XposedBridge.log("config changed: " + currentSpeed[0]);
                     currentSpeed[0] = getSpeedConfig();
                 }
                 // 应用当前速度
@@ -275,7 +270,7 @@ public class MainHook implements IXposedHookLoadPackage {
                 }
             }
         });
-        XposedBridge.log("Have hooked method resume");
+//        XposedBridge.log("Have hooked method resume");
     }
 }
 
