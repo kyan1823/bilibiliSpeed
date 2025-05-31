@@ -22,11 +22,7 @@ public class MainActivity extends Activity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // 获取SharedPreferences实例
-        try {
-            prefs = this.getSharedPreferences("speed", Context.MODE_WORLD_READABLE);
-        }catch (SecurityException e){
-            prefs = null;
-        }
+        prefs = this.getSharedPreferences("speed", MODE_PRIVATE);
         if (prefs == null) {
             Toast.makeText(this, "不支持XSharedPreferences", Toast.LENGTH_SHORT).show();
         } else {
@@ -68,7 +64,6 @@ public class MainActivity extends Activity {
             editor.apply();
             editor.putFloat("speed", speed);
             editor.commit();
-            editor.apply();
             Toast.makeText(this, "配置已保存: " + speed + ",下个视频生效", Toast.LENGTH_SHORT).show();
         } catch (NumberFormatException e) {
             Toast.makeText(this, "请输入有效的速度值", Toast.LENGTH_SHORT).show();

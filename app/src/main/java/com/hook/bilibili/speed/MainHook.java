@@ -1,6 +1,5 @@
 package com.hook.bilibili.speed;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import java.lang.reflect.Field;
@@ -19,9 +18,9 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
  */
 public class MainHook implements IXposedHookLoadPackage {
     // 共享偏好设置，用于存储和读取播放速度配置
-    private static final XSharedPreferences prefs = new XSharedPreferences("com.veo.hook.bili.speed", "speed");
+    private static final XSharedPreferences prefs = new XSharedPreferences("com.hook.bili.speed", "speed");
     // 默认播放速度
-    private static final float DEFAULT_SPEED = MainActivity.defValue;
+    private static final float DEFAULT_SPEED = 1.0f;
 
     private static XC_MethodHook.Unhook hookNotifyOnInfo = null;
     private static XC_MethodHook.Unhook hookOnPreparedListener_OnPrepared = null;
