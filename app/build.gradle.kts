@@ -3,6 +3,14 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        create("release") {
+            storeFile = file("D:\\android_sign\\sign.jks")
+            storePassword = "123456"
+            keyAlias = "123456"
+            keyPassword = "123456"
+        }
+    }
     namespace = "com.hook.bilibili.speed"
     compileSdk = 35
 
@@ -23,6 +31,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
@@ -31,6 +40,9 @@ android {
     }
     buildFeatures {
         viewBinding = true
+    }
+    lint {
+        baseline = file("lint-baseline.xml")
     }
 }
 
