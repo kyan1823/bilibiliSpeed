@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 暗色背景 -->
+    <color name="background">#FF121212</color>
+
+    <!-- 文字颜色反转 -->
+    <color name="primary_text">#FFFFFFFF</color>
+    <color name="secondary_text">#FFAAAAAA</color>
+
+    <!-- 控件颜色适配 -->
+    <color name="switch_track">#B3757575</color>
+</resources>
